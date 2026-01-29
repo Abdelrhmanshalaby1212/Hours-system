@@ -748,6 +748,224 @@ body {
     position: relative;
 }
 
+/* ====================================
+   Dashboard
+   ==================================== */
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dashboard-stat-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: box-shadow var(--transition-speed);
+}
+
+.dashboard-stat-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+}
+
+.dashboard-col-main,
+.dashboard-col-side {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Utilization progress bars */
+.utilization-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.utilization-row:last-child {
+    border-bottom: none;
+}
+
+.utilization-info {
+    width: 160px;
+    flex-shrink: 0;
+}
+
+.utilization-name {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.utilization-detail {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.progress-bar-track {
+    flex: 1;
+    height: 8px;
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.utilization-pct {
+    width: 40px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Quick action buttons */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    text-align: left;
+}
+
+.quick-action-btn:hover {
+    background-color: var(--bg-primary);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.qa-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.qa-text {
+    min-width: 0;
+}
+
+.qa-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.qa-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Summary card */
+.summary-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.summary-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.summary-label {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.summary-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Clickable table rows */
+.dashboard-row-clickable {
+    cursor: pointer;
+}
+
+.dashboard-row-clickable:hover {
+    background-color: var(--bg-primary) !important;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     #sidebar {
@@ -770,5 +988,9 @@ body {
     .modal {
         margin: 16px;
         max-width: calc(100% - 32px);
+    }
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
     }
 }

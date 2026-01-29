@@ -32,7 +32,7 @@ export class Router {
         // Handle initial route
         const initialRoute = window.location.hash
             ? window.location.hash.substring(1)
-            : '/inventories';
+            : '/';
 
         this.navigate(initialRoute, false);
     }
@@ -118,7 +118,7 @@ export class Router {
 
         // Default to inventories if no match
         if (!matchedHandler) {
-            this.navigate('/inventories');
+            this.navigate('/');
             return;
         }
 
@@ -149,8 +149,8 @@ export class Router {
                 <div class="empty-state-icon">⚠️</div>
                 <div class="empty-state-title">Something went wrong</div>
                 <div class="empty-state-description">${error.message || 'An unexpected error occurred'}</div>
-                <button class="btn btn-primary" onclick="window.location.hash = '/inventories'">
-                    Go to Inventories
+                <button class="btn btn-primary" onclick="window.location.hash = '/'">
+                    Go to Dashboard
                 </button>
             </div>
         `;

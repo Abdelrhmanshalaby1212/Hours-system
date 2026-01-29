@@ -12,6 +12,12 @@ export class Sidebar {
                 section: 'Main Menu',
                 items: [
                     {
+                        id: 'dashboard',
+                        label: 'Dashboard',
+                        icon: this.getIcon('dashboard'),
+                        route: '/',
+                    },
+                    {
                         id: 'inventories',
                         label: 'Inventories',
                         icon: this.getIcon('inventory'),
@@ -33,6 +39,12 @@ export class Sidebar {
      */
     getIcon(type) {
         const icons = {
+            dashboard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>`,
             inventory: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
@@ -68,7 +80,7 @@ export class Sidebar {
                         ${section.items
                             .map(
                                 (item) => `
-                            <div class="nav-item ${currentRoute.startsWith(item.route) ? 'active' : ''}"
+                            <div class="nav-item ${(item.route === '/' ? (currentRoute === '/' || currentRoute === '/dashboard') : currentRoute.startsWith(item.route)) ? 'active' : ''}"
                                  data-route="${item.route}">
                                 <span class="nav-item-icon">${item.icon}</span>
                                 <span>${item.label}</span>
@@ -109,11 +121,10 @@ export class Sidebar {
 
         navItems.forEach((item) => {
             const route = item.dataset.route;
-            if (currentRoute.startsWith(route)) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
+            const isActive = route === '/'
+                ? (currentRoute === '/' || currentRoute === '/dashboard')
+                : currentRoute.startsWith(route);
+            item.classList.toggle('active', isActive);
         });
     }
 }

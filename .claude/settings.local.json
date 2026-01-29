@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:h-m-s.runasp.net)",
+      "Bash(curl:*)",
+      "Bash(npm init:*)",
+      "Bash(python:*)",
+      "Bash(for i in 1 2 3 4 5 6 7 8 9 10)",
+      "Bash(do echo \"ID $i:\")",
+      "Bash(done)",
+      "Bash(tree:*)"
+    ]
+  }
+}

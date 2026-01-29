@@ -8,6 +8,7 @@ import { Sidebar } from './components/sidebar.js';
 import { InventoriesPage } from './pages/inventories.js';
 import { InventoryDetailsPage } from './pages/inventoryDetails.js';
 import { QualityControlPage } from './pages/qualityControl.js';
+import { DashboardPage } from './pages/dashboard.js';
 
 // Global toast notification function
 let toastTimeout = null;
@@ -53,6 +54,8 @@ function initApp() {
     const router = new Router();
 
     // Register routes
+    router.register('/', () => new DashboardPage(router));
+    router.register('/dashboard', () => new DashboardPage(router));
     router.register('/inventories', () => new InventoriesPage(router));
     router.register('/inventories/:id', (params) => new InventoryDetailsPage(router, params.id));
     router.register('/quality-control', () => new QualityControlPage(router));

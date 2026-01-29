@@ -16,16 +16,6 @@ export const API_BASE_URL = 'http://localhost:5000/api';
 export const REQUEST_TIMEOUT = 30000;
 
 /**
- * Default fetch options
- */
-export const defaultFetchOptions = {
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    mode: 'cors',
-};
-
-/**
  * Handle API response
  */
 export async function handleResponse(response) {
@@ -54,11 +44,17 @@ export async function handleResponse(response) {
  * Make a fetch request with default options
  */
 export async function apiFetch(url, options = {}) {
+    const headers = {};
+
+    // Only set Content-Type for requests with a body to avoid unnecessary CORS preflight
+    if (options.body) {
+        headers['Content-Type'] = 'application/json';
+    }
+
     const fetchOptions = {
-        ...defaultFetchOptions,
         ...options,
         headers: {
-            ...defaultFetchOptions.headers,
+            ...headers,
             ...options.headers,
         },
     };

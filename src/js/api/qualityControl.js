@@ -9,7 +9,7 @@
  * - GET api/QualityControl - Get all QC records (assumed)
  */
 
-import { USE_MOCK_API, API_BASE_URL, apiFetch, defaultFetchOptions } from './config.js';
+import { USE_MOCK_API, API_BASE_URL, apiFetch } from './config.js';
 import { mockQCRecords, mockAvailableRawMaterials, simulateDelay } from './mockData.js';
 
 // Local copy of mock data for manipulation
@@ -100,9 +100,24 @@ const MockQualityControlAPI = {
 const RealQualityControlAPI = {
     /**
      * Get all QC records
+     * Note: Backend does not have a "get all" endpoint, so we attempt
+     * to fetch by sequential IDs until we get a 404.
      */
     async getAll() {
-        return apiFetch(`${API_BASE_URL}/QualityControl`);
+        const records = [];
+        let id = 1;
+        let consecutiveMisses = 0;
+        while (consecutiveMisses < 3) {
+            try {
+                const record = await apiFetch(`${API_BASE_URL}/QualityControl/${id}`);
+                records.push(record);
+                consecutiveMisses = 0;
+            } catch (e) {
+                consecutiveMisses++;
+            }
+            id++;
+        }
+        return records;
     },
 
     /**
@@ -155,18 +170,13 @@ const RealQualityControlAPI = {
      * Get QC statistics (if endpoint exists)
      */
     async getStatistics() {
-        try {
-            return apiFetch(`${API_BASE_URL}/QualityControl/statistics`);
-        } catch (error) {
-            // Fallback: calculate from all records
-            const records = await this.getAll();
-            return {
-                total: records.length,
-                pending: records.filter((r) => r.status === 'Pending').length,
-                approved: records.filter((r) => r.status === 'Approved').length,
-                rejected: records.filter((r) => r.status === 'Rejected').length,
-            };
-        }
+        const records = await this.getAll();
+        return {
+            total: records.length,
+            pending: records.filter((r) => r.status === 'Pending').length,
+            approved: records.filter((r) => r.status === 'Approved').length,
+            rejected: records.filter((r) => r.status === 'Rejected').length,
+        };
     },
 };
 
