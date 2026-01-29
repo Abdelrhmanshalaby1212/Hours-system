@@ -1,7 +1,5 @@
-/**
- * Dashboard Page
- * Landing page with summary stats, utilization overview, and quick actions
- */
+
+ 
 
 import { InventoriesAPI } from '../api/inventories.js';
 import { RawMaterialsAPI } from '../api/rawMaterials.js';

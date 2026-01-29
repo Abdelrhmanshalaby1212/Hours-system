@@ -24,6 +24,12 @@ export class Sidebar {
                         route: '/inventories',
                     },
                     {
+                        id: 'supplier',
+                        label: 'Supplier',
+                        icon: this.getIcon('supplier'),
+                        route: '/supplier',
+                    },
+                    {
                         id: 'quality-control',
                         label: 'Quality Control',
                         icon: this.getIcon('qc'),
@@ -54,6 +60,13 @@ export class Sidebar {
                 <path d="M9 11l3 3L22 4"></path>
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>`,
+            supplier: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="12" y2="12"></line>
+                <line x1="15" y1="15" x2="12" y2="12"></line>
+            </svg>`,
         };
         return icons[type] || '';
     }
@@ -67,8 +80,11 @@ export class Sidebar {
         const html = `
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <div class="sidebar-logo-icon">E</div>
-                    <span>ERP System</span>
+                    <img src="assets/logo.png" alt="Horus" class="sidebar-logo-img">
+                    <div class="sidebar-logo-text">
+                        <span class="sidebar-brand">HORUS</span>
+                        <span class="sidebar-brand-sub">Management System</span>
+                    </div>
                 </div>
             </div>
             <nav class="sidebar-nav">
