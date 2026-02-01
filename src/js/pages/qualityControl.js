@@ -253,18 +253,12 @@ export class QualityControlPage {
             onSubmit: async (data) => {
                 this.modal.setLoading(true);
                 try {
-                    // 1. Approve the QC record
                     await QualityControlAPI.review(this.selectedRecord.id, {
                         decision: 'Approved',
                         isApproved: true,
                         reviewer: data.reviewer,
-                        comments: '',
-                    });
-
-                    // 2. Receive into selected inventory
-                    await InventoriesAPI.receiveFromQC({
-                        qualityControlId: this.selectedRecord.id,
                         inventoryId: parseInt(data.inventoryId),
+                        comments: '',
                     });
 
                     showToast('QC approved and material sent to inventory', 'success');
