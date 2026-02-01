@@ -10,6 +10,7 @@
 
 import { QualityControlAPI } from '../api/qualityControl.js';
 import { RawMaterialsAPI } from '../api/rawMaterials.js';
+import { InventoriesAPI } from '../api/inventories.js';
 import { Table, TableIcons } from '../components/table.js';
 import { Modal, generateFormFields } from '../components/modal.js';
 import { showToast } from '../app.js';
@@ -124,6 +125,12 @@ export class QualityControlPage {
                 render: (value, row) => `${value || 0} ${row.unit || 'units'}`,
             },
             {
+                key: 'reviewer',
+                label: 'Reviewer',
+                width: '120px',
+                render: (value) => value || '-',
+            },
+            {
                 key: 'status',
                 label: 'Status',
                 width: '100px',
@@ -199,42 +206,89 @@ export class QualityControlPage {
     async approveRecord() {
         if (!this.selectedRecord || !this.isPending(this.selectedRecord)) return;
 
-        const confirmed = await Modal.confirm({
-            title: 'Approve QC Record',
-            message: `Are you sure you want to approve this QC record?
-                      This will make the raw material available for inventory allocation.`,
-            confirmText: 'Approve',
-            confirmClass: 'btn-success',
-        });
-
-        if (confirmed) {
-            try {
-                // QualityControlReviewDto structure
-                await QualityControlAPI.review(this.selectedRecord.id, {
-                    decision: 'Approved',
-                    isApproved: true,
-                    reviewerName: 'System User',
-                    comments: '',
-                });
-
-                showToast('QC record approved successfully', 'success');
-
-                // Update local state
-                this.selectedRecord.status = 'Approved';
-                this.selectedRecord.qcStatus = 'Approved';
-                const recordIndex = this.qcRecords.findIndex(
-                    (r) => r.id === this.selectedRecord.id
-                );
-                if (recordIndex !== -1) {
-                    this.qcRecords[recordIndex].status = 'Approved';
-                    this.qcRecords[recordIndex].qcStatus = 'Approved';
-                }
-
-                this.renderDetailView();
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
+        // Load inventories for the dropdown
+        let inventories = [];
+        try {
+            inventories = await InventoriesAPI.getAll();
+            inventories = inventories.filter((inv) => inv.isActive !== false);
+        } catch (error) {
+            showToast('Failed to load inventories', 'error');
+            return;
         }
+
+        if (inventories.length === 0) {
+            showToast('No active inventories available. Please create an inventory first.', 'warning');
+            return;
+        }
+
+        const inventoryOptions = inventories.map((inv) =>
+            `<option value="${inv.id}">${inv.name} (${inv.code})</option>`
+        ).join('');
+
+        this.modal.open({
+            title: 'Approve QC Record',
+            content: `
+                <form id="approve-form">
+                    <p class="text-muted mb-4">
+                        Approving this QC record will send the raw material to the selected inventory.
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label required">Reviewer Name</label>
+                        <input type="text" class="form-control" name="reviewer" required
+                               placeholder="Enter your name...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Assign to Inventory</label>
+                        <select class="form-control" name="inventoryId" required>
+                            <option value="">Select an inventory...</option>
+                            ${inventoryOptions}
+                        </select>
+                    </div>
+                </form>
+            `,
+            footer: `
+                <button type="button" class="btn btn-secondary" data-action="cancel">Cancel</button>
+                <button type="submit" form="approve-form" class="btn btn-success">Approve</button>
+            `,
+            onSubmit: async (data) => {
+                this.modal.setLoading(true);
+                try {
+                    // 1. Approve the QC record
+                    await QualityControlAPI.review(this.selectedRecord.id, {
+                        decision: 'Approved',
+                        isApproved: true,
+                        reviewer: data.reviewer,
+                        comments: '',
+                    });
+
+                    // 2. Receive into selected inventory
+                    await InventoriesAPI.receiveFromQC({
+                        qualityControlId: this.selectedRecord.id,
+                        inventoryId: parseInt(data.inventoryId),
+                    });
+
+                    showToast('QC approved and material sent to inventory', 'success');
+
+                    this.selectedRecord.status = 'Approved';
+                    this.selectedRecord.qcStatus = 'Approved';
+                    this.selectedRecord.reviewer = data.reviewer;
+                    const recordIndex = this.qcRecords.findIndex(
+                        (r) => r.id === this.selectedRecord.id
+                    );
+                    if (recordIndex !== -1) {
+                        this.qcRecords[recordIndex].status = 'Approved';
+                        this.qcRecords[recordIndex].qcStatus = 'Approved';
+                        this.qcRecords[recordIndex].reviewer = data.reviewer;
+                    }
+
+                    this.modal.close();
+                    this.renderDetailView();
+                } catch (error) {
+                    showToast(error.message, 'error');
+                    this.modal.setLoading(false);
+                }
+            },
+        });
     }
 
     /**
@@ -252,6 +306,11 @@ export class QualityControlPage {
                         Rejecting this QC record will stop the procurement process for this material.
                     </p>
                     <div class="form-group">
+                        <label class="form-label required">Reviewer Name</label>
+                        <input type="text" class="form-control" name="reviewer" required
+                               placeholder="Enter your name...">
+                    </div>
+                    <div class="form-group">
                         <label class="form-label required">Rejection Reason</label>
                         <textarea class="form-control" name="comments" rows="3" required
                                   placeholder="Please provide a reason for rejection..."></textarea>
@@ -263,7 +322,7 @@ export class QualityControlPage {
                 <button type="submit" form="reject-form" class="btn btn-danger">Reject Record</button>
             `,
             onSubmit: async (data) => {
-                await this.processRejection(data.comments);
+                await this.processRejection(data.reviewer, data.comments);
             },
         });
     }
@@ -271,15 +330,14 @@ export class QualityControlPage {
     /**
      * Process rejection with reason
      */
-    async processRejection(reason) {
+    async processRejection(reviewer, reason) {
         this.modal.setLoading(true);
 
         try {
-            // QualityControlReviewDto structure
             await QualityControlAPI.review(this.selectedRecord.id, {
                 decision: 'Rejected',
                 isApproved: false,
-                reviewerName: 'System User',
+                reviewer: reviewer,
                 comments: reason,
             });
 
@@ -451,8 +509,8 @@ export class QualityControlPage {
                     <div class="detail-value">${record.quantity || 0} ${record.unit || 'units'}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Supplier</div>
-                    <div class="detail-value">${record.supplierName || record.supplier?.name || '-'}</div>
+                    <div class="detail-label">Reviewed By</div>
+                    <div class="detail-value">${record.reviewer || '-'}</div>
                 </div>
             </div>
 

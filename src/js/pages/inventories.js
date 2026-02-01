@@ -462,6 +462,8 @@ export class InventoriesPage {
         const fields = [
             { name: 'name', label: 'Name', type: 'text', required: true },
             { name: 'description', label: 'Description', type: 'textarea', required: false },
+            { name: 'purchaseInvoiceNumber', label: 'Purchase Invoice Number', type: 'text', required: true },
+            { name: 'quantity', label: 'Quantity', type: 'number', min: 0.01, step: 0.01, required: true },
         ];
 
         this.modal.open({
@@ -470,9 +472,9 @@ export class InventoriesPage {
                 <form id="raw-material-form" enctype="multipart/form-data">
                     ${generateFormFields(fields)}
                     <div class="form-group" style="margin-top: 16px;">
-                        <label class="form-label">Specification PDF</label>
+                        <label class="form-label required">Invoice PDF</label>
                         <label class="pdf-upload-area" id="pdf-upload-area">
-                            <input type="file" name="specificationPdf" accept=".pdf" id="pdf-input" style="display: none;">
+                            <input type="file" name="invoicePdf" accept=".pdf" id="pdf-input" required style="display: none;">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -480,7 +482,7 @@ export class InventoriesPage {
                                 <line x1="9" y1="15" x2="12" y2="12"></line>
                                 <line x1="15" y1="15" x2="12" y2="12"></line>
                             </svg>
-                            <span id="pdf-label" style="font-size: 13px; color: var(--text-secondary);">Click to upload PDF</span>
+                            <span id="pdf-label" style="font-size: 13px; color: var(--text-secondary);">Click to upload Invoice PDF</span>
                         </label>
                     </div>
                 </form>
@@ -491,6 +493,10 @@ export class InventoriesPage {
             `,
             onSubmit: async (data) => {
                 const fileInput = document.getElementById('pdf-input');
+                if (!fileInput.files[0]) {
+                    showToast('Please upload an Invoice PDF', 'error');
+                    return;
+                }
                 await this.createRawMaterial(data, fileInput.files[0]);
             },
         });
@@ -505,7 +511,7 @@ export class InventoriesPage {
                 pdfLabel.style.color = 'var(--text-primary)';
                 pdfArea.style.borderColor = 'var(--primary-color)';
             } else {
-                pdfLabel.textContent = 'Click to upload PDF';
+                pdfLabel.textContent = 'Click to upload Invoice PDF';
                 pdfLabel.style.color = 'var(--text-secondary)';
                 pdfArea.style.borderColor = '';
             }
@@ -522,11 +528,13 @@ export class InventoriesPage {
             const formData = new FormData();
             formData.append('Name', data.name);
             formData.append('Description', data.description || '');
+            formData.append('PurchaseInvoiceNumber', data.purchaseInvoiceNumber);
+            formData.append('Quantity', data.quantity);
             if (pdfFile) {
-                formData.append('SpecificationPdf', pdfFile);
+                formData.append('InvoicePdf', pdfFile);
             }
 
-            const response = await fetch(`${API_BASE_URL}/RawMaterials`, {
+            const response = await fetch(`${API_BASE_URL}/QualityControl/register-material-with-invoice`, {
                 method: 'POST',
                 body: formData,
             });
@@ -535,7 +543,11 @@ export class InventoriesPage {
                 let errorMessage = `HTTP error! status: ${response.status}`;
                 try {
                     const error = await response.json();
-                    errorMessage = error.message || error.title || errorMessage;
+                    if (error.errors) {
+                        errorMessage = Object.values(error.errors).flat().join(', ');
+                    } else {
+                        errorMessage = error.message || error.title || errorMessage;
+                    }
                 } catch (e) {}
                 throw new Error(errorMessage);
             }
