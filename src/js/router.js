@@ -44,7 +44,7 @@ export class Router {
      */
     navigate(path, addToHistory = true) {
         if (addToHistory) {
-            window.history.pushState({}, '', `#${path}`);
+            window.history.pushState({}, '', `${path}`);
         }
 
         this.handleRoute(path);
