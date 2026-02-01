@@ -967,112 +967,24 @@ body {
     background-color: var(--bg-primary) !important;
 }
 
-/* ====================================
-   Supplier Page
-   ==================================== */
 
-.supplier-layout {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 24px;
-    align-items: start;
-}
-
-.supplier-form-card {
-    position: sticky;
-    top: 24px;
-}
-
-/* Drop zone */
-.drop-zone {
+/* PDF Upload Area */
+.pdf-upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px;
     border: 2px dashed var(--border-color);
     border-radius: var(--border-radius);
-    padding: 32px;
-    text-align: center;
     cursor: pointer;
     transition: all var(--transition-speed);
     background-color: var(--bg-primary);
 }
 
-.drop-zone:hover {
+.pdf-upload-area:hover {
     border-color: var(--primary-color);
     background-color: rgba(37, 99, 235, 0.03);
-}
-
-.drop-zone-active {
-    border-color: var(--primary-color);
-    background-color: rgba(37, 99, 235, 0.06);
-    border-style: solid;
-}
-
-.drop-zone-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.drop-zone-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.drop-zone-hint {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-.drop-zone-input {
-    display: none;
-}
-
-/* Steps */
-.supplier-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.supplier-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-}
-
-.step-number {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: var(--primary-color);
-    color: var(--text-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
-    flex-shrink: 0;
-}
-
-.step-title {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text-primary);
-}
-
-.step-desc {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .supplier-layout {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* Responsive */

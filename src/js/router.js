@@ -24,9 +24,10 @@ export class Router {
      * Initialize the router
      */
     init() {
-        // Handle browser back/forward navigation
-        window.addEventListener('popstate', () => {
-            this.handleRoute(window.location.pathname + window.location.hash);
+        // Handle hash changes (back/forward navigation)
+        window.addEventListener('hashchange', () => {
+            const path = window.location.hash.substring(1) || '/';
+            this.handleRoute(path);
         });
 
         // Handle initial route
@@ -44,7 +45,8 @@ export class Router {
      */
     navigate(path, addToHistory = true) {
         if (addToHistory) {
-            window.history.pushState({}, '', `${path}`);
+            window.location.hash = path;
+            return; // hashchange event will call handleRoute
         }
 
         this.handleRoute(path);

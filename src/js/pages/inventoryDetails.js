@@ -291,7 +291,7 @@ export class InventoryDetailsPage {
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Distance from Production Hall</div>
-                    <div class="detail-value">${inv.distanceFromProductionHall || 0} m</div>
+                    <div class="detail-value">${inv.distanceToProductionHallMeters || 0} m</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Capacity</div>

@@ -7,7 +7,7 @@
 // IMPORTANT: Change the port to match your API server
 // Check your launchSettings.json or console output when running: dotnet run --project H_M_S/H_M_S.csproj
 // Example ports: 5000 (HTTP), 5001 (HTTPS), 7000, 7001, etc.
-export const API_BASE_URL = 'https://corsproxy.io/?http://h-m-s.runasp.net/api';
+export const API_BASE_URL = 'http://h-m-s.runasp.net/api';
 
 // Request timeout in milliseconds
 export const REQUEST_TIMEOUT = 30000;

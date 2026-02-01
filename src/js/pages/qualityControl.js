@@ -31,6 +31,7 @@ export class QualityControlPage {
      */
     async init() {
         this.render();
+        await this.loadRawMaterials();
         await this.loadQCRecords();
     }
 
@@ -42,7 +43,12 @@ export class QualityControlPage {
         this.renderTable();
 
         try {
-            this.qcRecords = await QualityControlAPI.getAll();
+            const records = await QualityControlAPI.getAll();
+            // Resolve raw material names from IDs
+            this.qcRecords = records.map((r) => {
+                const material = this.rawMaterials.find((m) => m.id === r.rawMaterialId);
+                return { ...r, rawMaterialName: material ? material.name : '-' };
+            });
         } catch (error) {
             showToast('Failed to load QC records: ' + error.message, 'error');
             this.qcRecords = [];
